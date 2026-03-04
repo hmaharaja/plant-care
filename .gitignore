@@ -1,0 +1,5 @@
+# Environment variables (contains secrets)
+.env
+.env.local
+venv
+__pycache__
