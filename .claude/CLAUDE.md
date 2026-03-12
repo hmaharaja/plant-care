@@ -87,35 +87,37 @@ All endpoints are stateless and require auth token in header. Missing/expired to
 
 ## Plant Care Template Object
 
-- plant_id
-- template_id
+- id
+- plant_id (FK to plants)
 - template_version
 - species
-- natural_hardiness_zone
+- hardiness_zone
 - light_requirements (enum)
-- watering_requirements (enum)
 - watering_interval_days
-- common_issues (list of issue_ids)
+- issue_ids (list of issue IDs)
 - soil_conditions (enum)
 
 ## User
 
 - user_id
 - username
+- hashed_password
 - created_at (timestamp)
 - user_timezone
 
-## UserPlants
+## UserPlant
 
+- id
 - user_id
 - plant_id
 - acquired_at (timestamp, optional)
+- nickname (optional str)
 
 ## Events
 
 - event_id
 - user_id
-- plant_id
+- user_plant_id (FK to user_plants.id)
 - timestamp
 - event_type (enum: watered, fertilized, repotted, pruned)
 - scheduled (bool)
@@ -127,6 +129,7 @@ All endpoints are stateless and require auth token in header. Missing/expired to
 
 - id
 - name
+- description
 - diagnosis_ids (list of diagnosis IDs)
 
 ## Diagnosis
@@ -211,7 +214,7 @@ Events are logged as immutable records:
 Each event includes:
 - event_id
 - user_id
-- plant_id
+- user_plant_id (FK to user_plants)
 - timestamp
 - event_type
 - scheduled (was this a scheduled reminder?)

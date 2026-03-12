@@ -10,6 +10,8 @@ class User(Base):
     user_id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, nullable=False, index=True)
     hashed_password = Column(String, nullable=False)
+    # oidc_provider = Column(String, nullable=True)
+    # oidc_subect = Column(String, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     user_timezone = Column(String, default="UTC")
 
