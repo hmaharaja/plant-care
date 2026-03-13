@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 from typing import Optional
 
@@ -29,7 +31,7 @@ class CareTemplate(BaseModel):
     light_requirements: Optional[str] = None
     watering_interval_days: Optional[int] = None
     soil_conditions: Optional[str] = None
-    issue_ids: list = []
+    issue_ids: list[int] = []
 
     class Config:
         from_attributes = True
@@ -43,8 +45,23 @@ class CareTemplateCreate(BaseModel):
     light_requirements: Optional[str] = None
     watering_interval_days: Optional[int] = None
     soil_conditions: Optional[str] = None
-    issue_ids: list = []
+    issue_ids: list[int] = []
 
 
 class CareTemplateResponse(CareTemplate):
     pass
+
+
+class UserPlantCreate(BaseModel):
+    user_id: int
+    plant_id: int
+    acquired_at: Optional[datetime] = None
+    nickname: Optional[datetime] = None
+
+
+class UserPlantResponse(BaseModel):
+    id: int
+    user_id: int
+    plant_id: int
+    acquired_at: Optional[datetime] = None
+    nickname: Optional[str] = None
