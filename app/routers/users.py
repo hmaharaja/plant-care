@@ -20,19 +20,13 @@ def get_users_plants(
     return db.query(UserPlantModel).filter(UserPlantModel.user_id == current_user.user_id).all()
 
 
-@router.post("/plants", response_model=UserPlantModel)
+@router.post("/plants", response_model=UserPlantResponse)
 def post_users_plants(
     user_plant_obj: UserPlantCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    # verify the user
-    if user_plant_obj.user_id != current_user.user_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Current user is not authorized to add plants to the requested user"
-        )
-    
+
     # verify the plant exists
     plant = db.query(PlantModel).filter(PlantModel.id == user_plant_obj.plant_id).first()
     if not plant:
@@ -52,7 +46,7 @@ def post_users_plants(
         )
 
     new_plant = UserPlantModel(
-        user_id=user_plant_obj.user_id,
+        user_id=current_user.user_id,
         plant_id=user_plant_obj.plant_id,
         acquired_at=user_plant_obj.acquired_at,
         nickname=user_plant_obj.nickname

@@ -53,10 +53,9 @@ class CareTemplateResponse(CareTemplate):
 
 
 class UserPlantCreate(BaseModel):
-    user_id: int
     plant_id: int
     acquired_at: Optional[datetime] = None
-    nickname: Optional[datetime] = None
+    nickname: Optional[str] = None
 
 
 class UserPlantResponse(BaseModel):

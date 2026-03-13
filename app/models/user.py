@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, ForeignKey, DateTime
+from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, UniqueConstraint
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
 from app.database import Base
@@ -20,6 +20,10 @@ class User(Base):
 
 class UserPlant(Base):
     __tablename__ = "user_plants"
+    
+    __table_args__ = (
+        UniqueConstraint('user_id', 'plant_id', name='uq_user_plant'),
+    )
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
@@ -30,3 +34,4 @@ class UserPlant(Base):
     user = relationship("User", back_populates="user_plants")
     plant = relationship("Plant", back_populates="user_plants")
     events = relationship("Event", back_populates="user_plant")
+    
