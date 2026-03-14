@@ -9,3 +9,4 @@ from app.schemas.plants import (
     UserPlantCreate,
 )
 from app.schemas.auth import User, UserCreate, UserInDB, Token, TokenData
+from app.schemas.events import EventCreate, EventResponse
