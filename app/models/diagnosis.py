@@ -12,6 +12,7 @@ class Diagnosis(Base):
     description = Column(String)
     symptoms = Column(JSON, default=list)
     treatments = Column(JSON, default=list)
+    plant_ids = Column(JSON, default=list)
 
 
 class DiagnosisLog(Base):

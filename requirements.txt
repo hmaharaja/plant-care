@@ -10,3 +10,5 @@ pydantic
 python-multipart
 authlib
 httpx
+google-generativeai
+rapidfuzz
