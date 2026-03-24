@@ -1,7 +1,9 @@
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
-from app.services.diagnosis_service import rule_based_diagnose
+from sqlalchemy.orm import Session
+
+from app.services.diagnosis_service import MAX_SYMPTOMS_FOR_RULE_ENGINE, rule_based_diagnose, llm_based_diagnose, diagnose, DiagnosisSource
 
 
 def create_mock_db(diagnoses):
@@ -156,7 +158,7 @@ class TestRuleBasedDiagnose(unittest.TestCase):
         )
 
         self.assertGreaterEqual(len(result), 1)
-        self.assertIn(result[0]["name"], ["Root Rot", "Underwatering"])
+        self.assertEqual(result[0]["name"], "Root Rot")
 
     # Test case 7: Trap diagnosis with too many symptoms fails precision check
     def test_trap_diagnosis_fails_precision(self):
@@ -197,5 +199,130 @@ class TestRuleBasedDiagnose(unittest.TestCase):
         self.assertEqual(result[0]["name"], "Simple Issue")
 
 
+
+class TestLLMBasedDiagnose(unittest.TestCase):
+    pass
+
+
+class TestDiagnose(unittest.TestCase):
+    
+    @patch(f"{diagnose.__module__}.rule_based_diagnose")
+    @patch(f"{diagnose.__module__}.llm_based_diagnose")
+    def test_should_use_rule_engine(self, mock_llm_based_diagnose, mock_rule_based_diagnose):
+        """Test when the rule engine is sufficient"""
+        mock_plant_id = 1
+        mock_plant_name = "snakeplant"
+        mock_species = "sanseveria"
+        mock_symptoms = ["yellow leaves", "mushy roots", "slow growth"]
+        mock_db_session = MagicMock(spec=Session)
+        
+        mock_rule_based_diagnose.return_value = [{
+            "id": mock_plant_id,
+            "name": "Overwatering",
+            "description": "Snake plants (sanseveria) are native to drier climates and dont like too much water",
+            "treatments": ["Let the soil dry out from the top 1-2 inches before watering", "repotting"],
+            "precision": 0.67,
+            "likelihood": 90,
+            "score": 0.67 * 90,
+            "source": DiagnosisSource.RULE_ENGINE,
+            "verified": True
+        }]
+        
+        result = diagnose(mock_plant_id, mock_plant_name, mock_species, mock_symptoms, mock_db_session)
+        
+        assert result == mock_rule_based_diagnose.return_value
+        mock_rule_based_diagnose.assert_called_once_with(mock_plant_id, mock_symptoms, mock_db_session)
+        mock_llm_based_diagnose.assert_not_called()
+    
+    
+    @patch(f"{diagnose.__module__}.rule_based_diagnose")
+    @patch(f"{diagnose.__module__}.llm_based_diagnose")
+    def test_boundary_symptom_count(self, mock_llm_based_diagnose, mock_rule_based_diagnose):
+        """Test that MAX_SYMPTOMS_FOR_RULE_ENGINE symptoms still uses rule engine"""
+        mock_plant_id = 1
+        mock_plant_name = "snakeplant"
+        mock_species = "sanseveria"
+        mock_symptoms = ["symptom"] * MAX_SYMPTOMS_FOR_RULE_ENGINE
+        
+        mock_db_session = MagicMock(spec=Session)
+        
+        mock_rule_based_diagnose.return_value = [{
+            "id": mock_plant_id,
+            "name": "Overwatering",
+            "description": "Snake plants (sanseveria) are native to drier climates and dont like too much water",
+            "treatments": ["Let the soil dry out from the top 1-2 inches before watering", "repotting"],
+            "precision": 0.67,
+            "likelihood": 90,
+            "score": 0.67 * 90,
+            "source": DiagnosisSource.RULE_ENGINE,
+            "verified": True
+        }]
+        
+        result = diagnose(mock_plant_id, mock_plant_name, mock_species, mock_symptoms, mock_db_session)
+
+        assert result == mock_rule_based_diagnose.return_value
+        mock_rule_based_diagnose.assert_called_once_with(mock_plant_id, mock_symptoms, mock_db_session)
+        mock_llm_based_diagnose.assert_not_called()
+    
+    
+    @patch(f"{diagnose.__module__}.rule_based_diagnose")
+    @patch(f"{diagnose.__module__}.llm_based_diagnose")
+    def test_should_use_llm_too_many_symptoms(self, mock_llm_based_diagnose, mock_rule_based_diagnose):
+        """Test when the llm based diagnosis should be called 
+        because there are too many symptoms the user input"""
+        mock_plant_id = 1
+        mock_plant_name = "snakeplant"
+        mock_species = "sanseveria"
+        mock_symptoms = ["yellow leaves", "mushy roots", "slow growth",
+                         "dying leaves", "wet soil", "spots on leaves", "weak stems"
+                         "drooping"]
+        
+        mock_db_session = MagicMock(spec=Session)
+        
+        mock_llm_based_diagnose.return_value = [{
+            "id": mock_plant_id,
+            "name": "Overwatering",
+            "description": "Snake plants (sanseveria) are native to drier climates and dont like too much water",
+            "treatments": ["Let the soil dry out from the top 1-2 inches before watering", "repotting"],
+            "likelihood": 90,
+            "source": DiagnosisSource.LLM,
+            "verified": False
+        }]
+        
+        
+        result = diagnose(mock_plant_id, mock_plant_name, mock_species, mock_symptoms, mock_db_session)
+        assert result == mock_llm_based_diagnose.return_value
+        mock_llm_based_diagnose.assert_called_once_with(mock_plant_name, mock_species, mock_symptoms, None)
+        mock_rule_based_diagnose.assert_not_called()
+    
+    
+    @patch(f"{diagnose.__module__}.rule_based_diagnose")
+    @patch(f"{diagnose.__module__}.llm_based_diagnose")
+    def test_should_use_llm_no_rule_based_match(self, mock_llm_based_diagnose, mock_rule_based_diagnose):
+        """Test when the rule engine fails and the llm fallback is needed"""
+        mock_plant_id = 1
+        mock_plant_name = "snakeplant"
+        mock_species = "sanseveria"
+        mock_symptoms = ["yellow leaves", "mushy roots", "drooping"]
+        
+        mock_db_session = MagicMock(spec=Session)
+        
+        mock_rule_based_diagnose.return_value = []
+        mock_llm_based_diagnose.return_value = [{
+            "id": mock_plant_id,
+            "name": "Overwatering",
+            "description": "Snake plants (sanseveria) are native to drier climates and dont like too much water",
+            "treatments": ["Let the soil dry out from the top 1-2 inches before watering", "repotting"],
+            "likelihood": 90,
+            "source": DiagnosisSource.LLM,
+            "verified": False
+        }]
+        
+        result = diagnose(mock_plant_id, mock_plant_name, mock_species, mock_symptoms, mock_db_session)
+        assert result == mock_llm_based_diagnose.return_value
+        mock_llm_based_diagnose.assert_called_once_with(mock_plant_name, mock_species, mock_symptoms, None)
+        mock_rule_based_diagnose.assert_called_once_with(mock_plant_id, mock_symptoms, mock_db_session)
+
+    
 if __name__ == '__main__':
     unittest.main()

@@ -22,7 +22,7 @@ class CareTemplate(Base):
     species = Column(String, nullable=False)
     hardiness_zone = Column(String)
     light_requirements = Column(String)  # enum later
-    watering_interval_days = Column(Integer)
+    default_watering_interval_days = Column(Integer, nullable=True)
     soil_conditions = Column(String)     # enum later
 
     # might need to use a join table later because a json column

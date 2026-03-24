@@ -10,3 +10,4 @@ from app.schemas.plants import (
 )
 from app.schemas.auth import User, UserCreate, UserInDB, Token, TokenData
 from app.schemas.events import EventCreate, EventResponse
+from app.schemas.diagnosis import DiagnosisRequest, DiagnosisResponse, DiagnosisResult, PublicDiagnosisRequest

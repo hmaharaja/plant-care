@@ -3,12 +3,12 @@ import json
 import heapq
 import google.generativeai as genai
 from typing import Dict, List, Optional
-from enum import Enum
 from rapidfuzz import fuzz
 from sqlalchemy.orm import Session
 from sqlalchemy.dialects.postgresql import JSONB
 
 from app.models.diagnosis import Diagnosis
+from app.enums import DiagnosisSource
 
 
 SIMILARITY_THRESHOLD = 80
@@ -17,11 +17,6 @@ MAX_SYMPTOMS_FOR_RULE_ENGINE = 7
 
 # configure genai model
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-
-class DiagnosisSource(Enum):
-    LLM = "LLM"
-    RULE_ENGINE = "DB_RULE_ENGINE"
-
 
 
 def get_prompt(plant_name: str, species: str, symptoms: list[str], additional_notes: Optional[str] = None) -> str:
@@ -53,6 +48,7 @@ def get_gemini_model() -> genai.GenerativeModel:
 
 
 def llm_based_diagnose(
+    plant_id: int,
     plant_name: str,
     species: str,
     symptoms: list[str],
@@ -68,6 +64,7 @@ def llm_based_diagnose(
         raise ValueError(f"LLM returned invalid JSON: {response.text}")
     
     for result in results:
+        result["id"] = plant_id
         result["source"] = DiagnosisSource.LLM
         result["verified"] = False
     
@@ -148,6 +145,6 @@ def diagnose(
             return rule_results
 
     # Fall back to LLM-based diagnosis
-    return llm_based_diagnose(plant_name, species, symptoms, additional_notes)
+    return llm_based_diagnose(plant_id, plant_name, species, symptoms, additional_notes)
 
 
