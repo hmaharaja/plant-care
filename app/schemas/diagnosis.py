@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel
@@ -28,4 +29,20 @@ class DiagnosisResult(BaseModel):
 
 class DiagnosisResponse(BaseModel):
     response: list[DiagnosisResult] = []
+
+
+class DiagnosisVerifyRequest(BaseModel):
+    diagnosis_names: list[str]
+
+
+class DiagnosisLogResponse(BaseModel):
+    id: int
+    user_plant_id: int
+    user_id: int
+    requested_at: datetime
+    symptoms_submitted: list[str]
+    results: list[DiagnosisResult]
+
+    class Config:
+        from_attributes = True
     
