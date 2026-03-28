@@ -22,36 +22,6 @@ class PlantResponse(Plant):
     pass
 
 
-class CareTemplate(BaseModel):
-    id: int
-    plant_id: int
-    template_version: int = 1
-    species: str
-    hardiness_zone: Optional[str] = None
-    light_requirements: Optional[str] = None
-    watering_interval_days: Optional[int] = None
-    soil_conditions: Optional[str] = None
-    issue_ids: list[int] = []
-
-    class Config:
-        from_attributes = True
-
-
-class CareTemplateCreate(BaseModel):
-    plant_id: int
-    template_version: int = 1
-    species: str
-    hardiness_zone: Optional[str] = None
-    light_requirements: Optional[str] = None
-    watering_interval_days: Optional[int] = None
-    soil_conditions: Optional[str] = None
-    issue_ids: list[int] = []
-
-
-class CareTemplateResponse(CareTemplate):
-    pass
-
-
 class UserPlantCreate(BaseModel):
     plant_id: int
     acquired_at: Optional[datetime] = None

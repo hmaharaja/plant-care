@@ -1,6 +1,8 @@
-from sqlalchemy import Column, String, Integer, ForeignKey, JSON
+from sqlalchemy import Column, String, Integer, ForeignKey, JSON, Enum as SQLEnum
 from sqlalchemy.orm import relationship
+
 from app.database import Base
+from app.enums import HardinessZone, LightRequirement, SoilCondition
 
 
 class Plant(Base):
@@ -20,10 +22,10 @@ class CareTemplate(Base):
     plant_id = Column(Integer, ForeignKey("plants.id"), nullable=False)
     template_version = Column(Integer, nullable=False, default=1)
     species = Column(String, nullable=False)
-    hardiness_zone = Column(String)
-    light_requirements = Column(String)  # enum later
+    hardiness_zones = Column(JSON, default=list)  # list of HardinessZone
+    light_requirements = Column(SQLEnum(LightRequirement), nullable=True)
     default_watering_interval_days = Column(Integer, nullable=True)
-    soil_conditions = Column(String)     # enum later
+    soil_conditions = Column(SQLEnum(SoilCondition), nullable=True)
 
     # might need to use a join table later because a json column
     # can refer an issue id that doesn't exist

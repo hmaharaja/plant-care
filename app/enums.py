@@ -37,3 +37,8 @@ class HardinessZone(str, Enum):
     ZONE_11 = "11"
     ZONE_12 = "12"
     ZONE_13 = "13"
+
+
+class Hemisphere(str, Enum):
+    NORTHERN = "northern"
+    SOUTHERN = "southern"

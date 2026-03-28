@@ -100,7 +100,7 @@ def post_care_template(
         plant_id=care_template_data.plant_id,
         template_version=care_template_data.template_version,
         species=care_template_data.species,
-        hardiness_zone=care_template_data.hardiness_zone,
+        hardiness_zones=care_template_data.hardiness_zones,
         light_requirements=care_template_data.light_requirements,
         default_watering_interval_days=care_template_data.default_watering_interval_days,
         soil_conditions=care_template_data.soil_conditions,

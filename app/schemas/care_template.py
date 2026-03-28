@@ -6,7 +6,7 @@ class CareTemplateCreate(BaseModel):
     plant_id: int
     template_version: int = 1
     species: str
-    hardiness_zone: Optional[str] = None
+    hardiness_zones: Optional[str] = None
     light_requirements: Optional[str] = None
     default_watering_interval_days: Optional[int] = None
     soil_conditions: Optional[str] = None
@@ -18,7 +18,7 @@ class CareTemplateResponse(BaseModel):
     plant_id: int
     template_version: int
     species: str
-    hardiness_zone: Optional[str] = None
+    hardiness_zones: Optional[str] = None
     light_requirements: Optional[str] = None
     default_watering_interval_days: Optional[int] = None
     soil_conditions: Optional[str] = None
@@ -31,7 +31,7 @@ class CareTemplateResponse(BaseModel):
 class CareTemplatePatch(BaseModel):
     template_version: Optional[int] = None
     species: Optional[str] = None
-    hardiness_zone: Optional[str] = None
+    hardiness_zones: Optional[str] = None
     light_requirements: Optional[str] = None
     default_watering_interval_days: Optional[int] = None
     soil_conditions: Optional[str] = None
