@@ -2,6 +2,7 @@ from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, UniqueCons
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
 from app.database import Base
+from app.models.plant import WateringSchedule
 
 
 class User(Base):
@@ -14,6 +15,7 @@ class User(Base):
     # oidc_subect = Column(String, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     user_timezone = Column(String, default="UTC")
+    phone_number = Column(String, nullable=True)
 
     user_plants = relationship("UserPlant", back_populates="user")
 
@@ -34,4 +36,4 @@ class UserPlant(Base):
     user = relationship("User", back_populates="user_plants")
     plant = relationship("Plant", back_populates="user_plants")
     events = relationship("Event", back_populates="user_plant")
-    
+    watering_schedules = relationship("WateringSchedule", back_populates="user_plant")

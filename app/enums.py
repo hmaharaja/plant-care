@@ -7,20 +7,20 @@ class DiagnosisSource(str, Enum):
 
 
 class LightRequirement(str, Enum):
-    LOW = "low"
-    MEDIUM = "medium"
-    BRIGHT_INDIRECT = "bright_indirect"
-    FULL_SUN = "full_sun"
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    BRIGHT_INDIRECT = "BRIGHT_INDIRECT"
+    FULL_SUN = "FULL_SUN"
 
 
 class SoilCondition(str, Enum):
-    SANDY = "sandy"
-    LOAM = "loam"
-    CLAY = "clay"
-    PEAT = "peat"
-    WELL_DRAINING = "well_draining"
-    WELL_DRAINING_AERATED = "well_draining_aerated"
-    CACTI_MIX = "cacti"
+    SANDY = "SANDY"
+    LOAM = "LOAM"
+    CLAY = "CLAY"
+    PEAT = "PEAT"
+    WELL_DRAINING = "WELL_DRAINING"
+    WELL_DRAINING_AERATED = "WELL_DRAINING_AERATED"
+    CACTI_MIX = "CACTI"
 
 
 class HardinessZone(str, Enum):
@@ -40,5 +40,5 @@ class HardinessZone(str, Enum):
 
 
 class Hemisphere(str, Enum):
-    NORTHERN = "northern"
-    SOUTHERN = "southern"
+    NORTHERN = "NORTHERN"
+    SOUTHERN = "SOUTHERN"

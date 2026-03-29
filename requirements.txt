@@ -12,3 +12,6 @@ authlib
 httpx
 google-generativeai
 rapidfuzz
+celery
+redis
+twilio
